@@ -1,14 +1,20 @@
 'use client'
 // MODULE
 import Image from 'next/image'
-import { useState } from 'react'
-
+import useSWR from 'swr'
+// import { useState } from 'react'
+const fetcher = (url: any) => fetch(url).then((res) => res.json())
 const Header: React.FC = () => {
-  const [keyword, setKeyword] = useState<string>('')
+  const { data, error } = useSWR('/api/searchAPI', fetcher)
+  if (error) return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>
+  if (!data) return <div>데이터를 불러오는 중입니다...</div>
+
+  const users = data.items // 검색 결과 목록
+  // const [keyword, setKeyword] = useState<string>('')
 
   const onChangeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
-    setKeyword(e.target.value)
+    // setKeyword(e.target.value)
   }
   return (
     <header id="header">
@@ -24,7 +30,7 @@ const Header: React.FC = () => {
               type="text"
               id="keyword"
               name="keyword"
-              value={keyword}
+              // value={keyword}
               onChange={onChangeKeyword}
             />
             <button>검색</button>
