@@ -1,3 +1,9 @@
+import ManualBox from '@/component/manual/ManualBox'
+
 export default function Home() {
-  return <main></main>
+  return (
+    <main>
+      <ManualBox />
+    </main>
+  )
 }
