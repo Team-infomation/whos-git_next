@@ -1,20 +1,31 @@
 'use client'
 // MODULE
 import Image from 'next/image'
-import useSWR from 'swr'
-// import { useState } from 'react'
-const fetcher = (url: any) => fetch(url).then((res) => res.json())
-const Header: React.FC = () => {
-  const { data, error } = useSWR('/api/searchAPI', fetcher)
-  if (error) return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>
-  if (!data) return <div>데이터를 불러오는 중입니다...</div>
+import { searchStore } from '@/store/searchStore'
 
-  const users = data.items // 검색 결과 목록
-  // const [keyword, setKeyword] = useState<string>('')
+const Header: React.FC = () => {
+  const { keyword, setKeyword, searchResult, setSearchResults } = searchStore()
 
   const onChangeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
-    // setKeyword(e.target.value)
+    setKeyword(e.target.value)
+  }
+  const handleSearch = async () => {
+    console.log(keyword)
+    try {
+      const response = await fetch(
+        `https://api.github.com/search/users?q=${keyword}`,
+      )
+      const data = await response.json()
+      console.log(data)
+      if (response.ok) {
+        setSearchResults(data.items)
+      } else {
+        console.error('API 오류 발생:', response.status)
+      }
+    } catch (error) {
+      console.error('검색 결과 가져오기 오류:', error)
+    }
   }
   return (
     <header id="header">
@@ -33,7 +44,7 @@ const Header: React.FC = () => {
               // value={keyword}
               onChange={onChangeKeyword}
             />
-            <button>검색</button>
+            <button onClick={() => handleSearch()}>검색</button>
           </li>
         </ul>
       </div>
